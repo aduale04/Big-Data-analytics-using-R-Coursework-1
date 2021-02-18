@@ -1,0 +1,614 @@
+---
+title: "BDA/IDAR Coursework 1 - Solutions"
+output:
+  pdf_document: default
+---
+
+\newcommand{\solution}{\textbf{Solution: }}
+\newcommand{\comment}[1]{}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+\comment{
+\fbox{
+\begin{minipage}[t]{\textwidth}
+\begin{itemize}
+ \item Please submit TWO files to Dropbox 1 on moodle: a .rmd file and knit it to one of the following  (.doc/.pdf/.html) files. Please include any R code, plots or results.
+  
+
+  
+  \vspace{1ex}
+  
+  \item Your files should be named as follows: CW1\_xxxxxxxx\_initial\_lastname.rmd (.pdf/.html/.doc), where xxxxxxxx is your student id. For instance, CW1\_12345678\_T\_Han.rmd.
+  
+    \vspace{1ex}
+
+\item Don't forget to write down your programme (MSc or BSc), name and student id in your files as well.
+
+\vspace{1ex}
+  
+  \item Each question below has two weightings. The first weighting is for MSc students and the second weighting is for BSc students. For instance, ($10\%\mid0\%$) means that the question is worth 10\% for MSc students and 0\% for BSc students (optional). 
+\end{itemize}
+\end{minipage}}
+
+}
+
+
+#### 1. Statistical learning methods \hfill ($10\%\mid 20\%$)
+\fbox{
+\begin{minipage}[t]{\textwidth}
+Marking scheme: $2.5\%\mid 5\%$ each.
+\end{minipage}}
+
+For each of parts (a) through (d), indicate whether we would generally expect the performance of a flexible statistical learning method to be better or worse than an inflexible method. Justify your answer. 
+
+(a) The sample size $n$ is extremely large, and the number of predictors $p$ is small.
+
+\solution Better. We expect that with a very large number of measurements $n$, a flexible learning method will fit the data closer and will be able to learn the signal (y) without as much fear of overfitting. 
+
+(b) The number of predictors $p$ is extremely large, and the number
+of observations $n$ is small.
+
+\solution Worse. If the number of predictors $p$ is very large and $n$ small then there is a greater possibility that a flexible learning method would overfit. Then we expect the inflexible method to be better in this case. 
+
+(c) The relationship between the predictors and response is highly
+non-linear.
+
+\solution Better. A higly non-linear relationship would most likely need a flexible statistical learning method to perform optimally.
+
+(d) The variance of the error terms, i.e. $\sigma^2 = \textrm{Var}(\epsilon)$, is extremely
+high.
+
+\solution Worse. With a very large error term variance $\sigma^2$ there is more worry about overfitting and thus an inflexible method would perform better. 
+
+#### 2. Descriptive analysis \hfill ($10\%\mid 20\%$)
+\fbox{
+\begin{minipage}[t]{\textwidth}
+Marking scheme: $2.5\%\mid 5\%$ each.
+\end{minipage}}
+
+In a higher educational institution the comprehensive applied mathematics exam is comprised of two parts. On the first day, 20 students took the exam, the results of which are presented below:
+
+\begin{center}\begin{tabular}{ll}Oral exam results:& 4, 1, 4, 5, 3, 2, 3, 4, 3, 5, 2, 2, 4, 3, 5, 5, 1, 1, 1, 2.\\
+Written exam results:& 2, 3, 1, 4, 2, 5, 3, 1, 2, 1, 2, 2, 1, 1, 2, 3, 1, 2, 3, 4.\\
+\end{tabular}\end{center}
+
+(a) Use R to calculate the mean, the mode, the median, the variance and the standard deviation of the oral and written exams separately and added together as well. 
+
+\solution
+
+
+```{r}
+oral <-    c(4, 1, 4, 5, 3, 2, 3, 4, 3, 5, 2, 2, 4, 3, 5, 5, 1, 1, 1, 2)
+written <- c(2, 3, 1, 4, 2, 5, 3, 1, 2, 1, 2, 2, 1, 1, 2, 3, 1, 2, 3, 4)
+total <- oral + written
+
+df <- data.frame(oral, written, total)
+paste("The mean")   #paste, sprintf, print will all print some strings
+apply(df,2,mean)  #2 means per column
+sprintf("The median")
+apply(df,2,median) 
+print("The variance")
+apply(df,2,var)
+print("The standard deviation")
+apply(df,2,sd) 
+
+#define a new function
+myMode <- function(x){
+  names(sort(-table(x)))[1]
+}
+
+paste("mode")
+apply(df,2,myMode) 
+```
+
+(b) Find the covariance and correlation between the oral and written exam scores.
+
+\solution
+
+```{r}
+cov(df$oral,df$written)  #It's also fine to write cov(oral, written)
+cor(df$oral,df$written)
+cor(df$oral,df$total)
+cor(df$total,df$written)
+```
+
+(c) Is there a positive or negative or no correlation between the
+two?
+
+\solution There is a very weak (low) negative correlation between the two. However there is quite a strong (high) postive correlation between the total and oral and a weak positive correlation between written and total. 
+
+(d) Is there causation between the two? Justify your answers.
+
+\solution Normally, when two variables are correlated, we start discussing about the causation. In this case, there is very low correlation between the two, and statistically it means that there is no linear relationship between the two. However, there might be non-linear relationship relationship and causation.
+
+
+#### 3. Descriptive analysis \hfill ($10\%\mid 0\%$)
+
+\fbox{
+\begin{minipage}[t]{\textwidth}
+Marking scheme: MSc students only. (b)(c) $1\%$ each, the rest 2$\%$ each.
+\end{minipage}}
+
+This exercise involves the ```Auto``` data set studied in the class. 
+
+(a) Which of the predictors are quantitative, and which are qualitative?
+
+\solution Using the `summary` command on `Auto` dataset we easily see which predictors are quantitative: `mpg`, `displacement`, `horsepower`, `cylinders` and `acceleration`. While the variables `year` (values are 70 - 82), `origin` (values are 1, 2 or 3) and `name` are quantitative. Note that `year` is an ordinal variable as addition is meaningless. And an ordinal variable is qualitative.
+
+```{r}
+library(ISLR)
+summary(Auto)
+table(Auto$year)
+```
+
+(b) What is the range of each quantitative predictor? You can answer this using the ```range()``` function.
+
+\solution
+
+```{r}
+names(Auto)  # figure out which columns are quantitative 1:6
+
+sapply(Auto[,1:6], range) #sapply applies a function (here: range) to each column of the dataset.
+```
+
+(c) What is the mean and standard deviation of each quantitative
+predictor?
+
+\solution
+
+```{r}
+sapply(Auto[,1:6], mean)
+sapply(Auto[,1:6], sd)
+```
+
+(d) Now remove the 10th through 85th observations in the dataset. What is the
+range, mean, and standard deviation of each predictor in the
+subset of the data that remains?
+
+\solution
+
+```{r}
+sapply(Auto[-(10:85),1:6], range) 
+sapply(Auto[-(10:85),1:6], mean) 
+sapply(Auto[-(10:85),1:6], sd) 
+```
+
+(e) Using the full data set, investigate the predictors graphically, using scatterplots or other tools of your choice. Create some plots highlighting the relationships among the predictors. Comment on your findings.
+
+\solution
+
+```{r}
+pairs(Auto)
+
+par(mfrow=c(2,2))
+# A scatter plot. Heavier cars lower mpg
+plot(Auto$weight, Auto$mpg, xlab = "Weight", ylab = "Mpg")
+
+# A boxplot. More cylinders, lower mpg. 
+# Certain cylinder sizes (eg.4) seems to give a larger mpg.
+plot(as.factor(Auto$cylinders), Auto$mpg, xlab = "Cylinder", ylab = "Mpg")
+
+# A boxplot. Year increased, mpg also increased.
+plot(as.factor(Auto$year), Auto$mpg, xlab = "Year", ylab = "Mpg")
+
+# A boxplot. We see very different values for mpg depending on origin.
+# This indicates that this is perhaps a strong predictor of mpg.
+plot(as.factor(Auto$origin), Auto$mpg, xlab = "Origin", ylab = "Mpg") 
+```
+
+(f) Suppose that we wish to predict gas mileage (```mpg```) on the basis
+of the other variables. Do your plots suggest that any of the
+other variables might be useful in predicting ```mpg```? Justify your answer.
+
+\solution
+The plots in (e) indicate that there are several predictors that could be predictive of `mpg`, e.g., `year`, `weight`, `cylinders` and `origin`.
+
+#### 4. Linear regression \hfill ($20\%\mid 20\%$)
+\fbox{
+\begin{minipage}[t]{\textwidth}
+Marking scheme: (a) i - iv $2.5\%$ each, (b)(c) $5\%$ each.
+\end{minipage}}
+
+This question involves the use of simple linear regression on the ```Auto``` data set.
+
+(a) Use the ```lm()``` function to perform a simple linear regression with
+`mpg` as the response and `horsepower` as the predictor. Use the
+```summary()``` function to print the results. Comment on the output. For example:
+
+i. Is there a relationship between the predictor and the response?
+
+\solution
+
+```{r}
+library(ISLR)
+lm.fit <- lm(mpg ~ horsepower, data = Auto)
+summary(lm.fit)
+```
+
+The p-value for the model is quite small. This suggests that there is a relationship between `mpg` and `horsepower`.
+
+ii. How strong is the relationship between the predictor and
+the response?
+
+\solution
+
+The value of $R^2$ measures the strength of a relationship. In this case, adjusted $R^2=0.6049$, which says that $60\%$ of the variance has been explained using the predictor `horsepower`.
+
+iii. Is the relationship between the predictor and the response
+positive or negative?
+
+\solution
+
+The estimate of the coefficient for `horsepower` is $-0.157845$. This suggests that the relationship is negative, i.e., as `horsepower` increases `mpg` will decrease.  
+
+iv. What is the predicted `mpg` associated with a `horsepower` of
+98? What are the associated 95% confidence and prediction
+intervals?
+
+\solution
+
+```{r}
+predict(lm.fit, data.frame(horsepower = 98), interval = "confidence")
+
+predict(lm.fit, data.frame(horsepower = 98), interval = "prediction")
+```
+
+The prediction associated with `horsepower = 98` is 24.46708. The confidence interval is [23.97308, 24.96108], and the prediction interval is [14.8094, 34.12476].
+
+
+(b) Plot the response and the predictor. Use the ```abline()``` function
+to display the least squares regression line.
+
+\solution
+
+```{r}
+plot(Auto$horsepower, Auto$mpg, xlab = "horsepower", ylab = "mpg")
+abline(lm.fit)
+```
+
+(c) Plot the 95% confidence interval and prediction interval in the same plot as (b) using different colours and legends. 
+
+\solution
+
+```{r}
+plot(Auto$horsepower, Auto$mpg, 
+     xlab = "horsepower", ylab = "mpg", 
+     ylim=c(0, 50), xlim=c(30, 230))
+abline(lm.fit)
+nd <- data.frame(horsepower=seq(30, 230, by=10))
+p_conf <- predict(lm.fit,interval="confidence",newdata=nd)
+p_pred <- predict(lm.fit,interval="prediction",newdata=nd)
+lines(nd$horsepower, p_conf[,"lwr"], col="red", type="l", pch="+")
+lines(nd$horsepower, p_conf[,"upr"], col="red", type="l", pch="+")
+lines(nd$horsepower, p_pred[,"upr"], col="blue", type="l", pch="*")
+lines(nd$horsepower, p_pred[,"lwr"], col="blue", type="l", pch="*")
+
+
+```
+
+#### 5. Logistic regression  \hfill ($10\%\mid 20\%$)
+\fbox{
+\begin{minipage}[t]{\textwidth}
+Marking scheme: 
+ 
+(1) create crim01 and add it to data set 
+
+(2) split dataset into train and testing sets
+
+(3) build model
+
+(4) calculate test error rate
+
+(5) try several models
+
+$2\%\mid 4\%$ each.
+\end{minipage}}
+
+Using the Boston data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression models using various subsets of the predictors. Describe your findings.
+
+\solution
+
+```{r}
+library(MASS)
+data("Boston")
+n <- dim(Boston)[1]
+
+# Introduce a variable whether or not the crime rate is above=1 / below=0 the median 
+Boston$crim01 <- rep(0, n) #add a column in Boston in this way
+#or you can use Boston <- data.frame(Boston, crim01)
+Boston$crim01[Boston$crim >= median(Boston$crim)] <- 1
+Boston$crim <- NULL #remove the column of crim in this way
+ 
+
+# Look to see what features are most strongly correlated with crim01:
+#
+Boston.cor = cor(Boston)
+print(sort(Boston.cor[,'crim01']))
+
+# Split the data set into testing and training parts:
+set.seed(10)
+train <- sample(1:n,0.7*n)  #70% data for training, 30% for testing. 
+#You may also choose half/half.
+
+Boston.train <- Boston[train,]
+Boston.test <- Boston[-train,]
+
+# Fit several models to the training data 
+#
+# Define a function to calculate and print the error rate given a glm model
+printErrorRate <- function(glm.model){
+  crim01_pred <- predict(glm.model, 
+                         newdata=Boston.test, type="response")
+  yhat <- rep(0, length(crim01_pred))
+  yhat[crim01_pred > 0.5] <- 1
+  CM <- table(predicted=yhat, truth=Boston.test$crim01)  
+  #CM is the confusion matrix
+  print(CM)
+  print(paste("The error rate is", (CM[1,2] + CM[2,1])/sum(CM)))
+}
+
+#model 1
+glm_model_1 <- glm(crim01 ~ ., 
+                  data=Boston.train, family=binomial)
+printErrorRate(glm_model_1)
+
+
+#model 2
+glm_model_2 <- glm(crim01 ~ nox + rad + dis, 
+                  data=Boston.train, family=binomial)
+printErrorRate(glm_model_2)
+
+
+#model 3
+glm_model_3 <- glm(crim01 ~ nox + rad + dis + lstat, 
+                  data=Boston.train, family=binomial)
+printErrorRate(glm_model_3)
+
+#model 4
+glm_model_4 <- glm(crim01 ~ nox, 
+                  data=Boston.train, family=binomial)
+printErrorRate(glm_model_4)
+```
+
+#### 6. Resampling methods \hfill ($20\%\mid 0\%$)
+\fbox{
+\begin{minipage}[t]{\textwidth}
+Marking scheme: (MSc students only)
+
+Point which method to use (Either method will do). ($5\%$)
+
+Describe how the method works in this problem. ($10\%$)
+
+Describe how to derive the SD (It's not enough to end at SE or variance.)($5\%$) 
+\end{minipage}}
+
+Suppose that we use some statistical learning method to make a prediction
+for the response Y for a particular value of the predictor X.
+Carefully describe how we might estimate the standard deviation of
+our prediction. (You don't need to give a concrete example. )
+
+\solution
+
+We could apply a LOOCV type technique (less computationally intensive methods could be devised) so that we would have $n-1$ estimates of $Y$. The variance of these $Y$ could be used to estimate the variance of our prediction. The standard deviation is the square root of the variance.
+
+Or alternatively, we may estimate the standard deviation of our prediction by using the bootstrap method. In this case, rather than obtaining new independant data sets from the population and fitting our model on those data sets, we instead obtain repeated random samples from the original data set. In this case, we perform sampling with replacement B times and then find the corresponding estimates and the standard error of those B estimates by using equation (5.8) in the book. The standard deviation (SD) can be calculated from the standard error (SE) by the following formula:
+\[SD = SE \times \sqrt{N}\]
+
+#### 7. Resampling methods \hfill ($20\%\mid 20\%$)
+\fbox{
+\begin{minipage}[t]{\textwidth}
+Marking scheme: (c)(d) $4\%$ each, the rest $3\%$ each.
+\end{minipage}}
+
+We will now perform cross-validation on a simulated data set.
+
+(a) Generate a simulated data set as follows:
+
+```{r}
+set.seed(500)
+y = rnorm(500)
+x = 4 - rnorm(500)
+y = x - 2*x^2 + 3*x^4 + rnorm(500)
+```
+
+In this data set, what is $n$ and what is $p$? Write out the model used to generate the data in equation form.
+
+\solution
+ $n=500$ and $p=3$, assuming the predictors to be $x, x^2$ and $x^4$. The model is 
+ \[Y=X-2X^2+3X^4+\varepsilon\]
+
+(b) Create a scatterplot of X against Y. Comment on what you find.
+
+\solution
+
+```{r}
+set.seed(500)
+y = rnorm(500)
+x = 4 - rnorm(500)
+y = x - 2*x^2 + 3*x^4 + rnorm(500)
+plot(x,y)
+```
+
+(c) Set the seed to be 23, and then compute the LOOCV and 10-fold CV errors that result from fitting the following four models using least squares:
+i. $Y  = \beta_0  + \beta_1X  + \varepsilon$ 
+ii. $Y  = \beta_0  + \beta_1X  + \beta_2X^2  + \varepsilon$
+iii. $Y  = \beta_0  + \beta_1X  + \beta_2X^2  + \beta_3X^3  + \varepsilon$
+iv. $Y  = \beta_0  + \beta_1X  + \beta_2X^2  + \beta_3X^3  + \beta_4X^4  + \varepsilon.$
+
+Note you may find it helpful to use the `data.frame()` function to create a single data set containing both X and Y.
+
+\solution
+
+```{r, eval=FALSE}
+library(boot)
+DF <- data.frame(x,y)
+set.seed(23)
+
+# Do LOOCV on each model:
+# 
+m_1 <- glm(y ~ x, data=DF)
+cv.err <- cv.glm(DF, m_1)
+print(paste("Model (1): The LOOCV output is ", cv.err$delta[1]))
+
+m_2 <- glm(y ~ poly(x,2), data=DF)
+cv.err <- cv.glm(DF, m_2)
+print(paste("Model (2): The LOOCV output is ", cv.err$delta[1]))
+
+m_3 <- glm(y ~ poly(x,3), data=DF)
+cv.err <- cv.glm(DF, m_3)
+print(paste("Model (3): The LOOCV output is ", cv.err$delta[1]))
+
+m_4 <- glm(y ~ poly(x,4), data=DF)
+cv.err <- cv.glm(DF, m_4)
+print(paste("Model (4): The LOOCV output is ", cv.err$delta[1]))
+
+# Do 10 fold CV on each model:
+# 
+cv.err <- cv.glm(DF, m_1, K=10)
+print(paste("Model (1): The 10 fold CV output is ", cv.err$delta[1]))
+
+cv.err <- cv.glm(DF, m_2, K=10)
+print(paste("Model (2): The 10 fold CV output is ", cv.err$delta[1]))
+
+cv.err <- cv.glm(DF, m_3, K=10)
+print(paste("Model (3): The 10 fold CV output is ", cv.err$delta[1]))
+
+cv.err <- cv.glm(DF, m_4, K=10)
+print(paste("Model (4): The 10 fold CV output is ", cv.err$delta[1]))
+```
+
+```{r, echo=FALSE}
+library(boot)
+DF <- data.frame(x,y)
+set.seed(23)
+
+# Do LOOCV on each model:
+# 
+m_1 <- glm(y ~ x, data=DF)
+cv.err <- cv.glm(DF, m_1)
+print(paste("Model (1): The LOOCV output is ", cv.err$delta[1]))
+
+m_2 <- glm(y ~ poly(x,2), data=DF)
+cv.err <- cv.glm(DF, m_2)
+print(paste("Model (2): The LOOCV output is ", cv.err$delta[1]))
+
+m_3 <- glm(y ~ poly(x,3), data=DF)
+cv.err <- cv.glm(DF, m_3)
+print(paste("Model (3): The LOOCV output is ", cv.err$delta[1]))
+
+m_4 <- glm(y ~ poly(x,4), data=DF)
+cv.err <- cv.glm(DF, m_4)
+print(paste("Model (4): The LOOCV output is ", cv.err$delta[1]))
+
+# Do 10 fold CV on each model:
+# 
+cv.err <- cv.glm(DF, m_1, K=10)
+print(paste("Model (1): The 10 fold CV output is ", cv.err$delta[1]))
+
+cv.err <- cv.glm(DF, m_2, K=10)
+print(paste("Model (2): The 10 fold CV output is ", cv.err$delta[1]))
+
+cv.err <- cv.glm(DF, m_3, K=10)
+print(paste("Model (3): The 10 fold CV output is ", cv.err$delta[1]))
+
+cv.err <- cv.glm(DF, m_4, K=10)
+print(paste("Model (4): The 10 fold CV output is ", cv.err$delta[1]))
+```
+
+(d) Repeat (c) using random seed 46, and report your results. Are your results the same as what you got in (c)? Why?
+
+\solution
+
+```{r,eval=FALSE}
+library(boot)
+DF <- data.frame(x,y)
+set.seed(46)
+# Do LOOCV on each model:
+# 
+m_1 <- glm(y ~ x, data=DF)
+cv.err <- cv.glm(DF, m_1)
+print(paste("Model (1): The LOOCV output is ", cv.err$delta[1]))
+
+m_2 <- glm(y ~ poly(x,2), data=DF)
+cv.err <- cv.glm(DF, m_2)
+print(paste("Model (2): The LOOCV output is ", cv.err$delta[1]))
+
+m_3 <- glm(y ~ poly(x,3), data=DF)
+cv.err <- cv.glm(DF, m_3)
+print(paste("Model (3): The LOOCV output is ", cv.err$delta[1]))
+
+m_4 <- glm(y ~ poly(x,4), data=DF)
+cv.err <- cv.glm(DF, m_4)
+print(paste("Model (4): The LOOCV output is ", cv.err$delta[1]))
+
+# Do 10 fold CV on each model:
+# 
+cv.err <- cv.glm(DF, m_1, K=10)
+print(paste("Model (1): The 10 fold CV output is ", cv.err$delta[1]))
+
+cv.err <- cv.glm(DF, m_2, K=10)
+print(paste("Model (2): The 10 fold CV output is ", cv.err$delta[1]))
+
+cv.err <- cv.glm(DF, m_3, K=10)
+print(paste("Model (3): The 10 fold CV output is ", cv.err$delta[1]))
+
+cv.err <- cv.glm(DF, m_4, K=10)
+print(paste("Model (4): The 10 fold CV output is ", cv.err$delta[1]))
+```
+
+```{r, echo=FALSE}
+library(boot)
+DF <- data.frame(x,y)
+set.seed(46)
+# Do LOOCV on each model:
+# 
+m_1 <- glm(y ~ x, data=DF)
+cv.err <- cv.glm(DF, m_1)
+print(paste("Model (1): The LOOCV output is ", cv.err$delta[1]))
+
+m_2 <- glm(y ~ poly(x,2), data=DF)
+cv.err <- cv.glm(DF, m_2)
+print(paste("Model (2): The LOOCV output is ", cv.err$delta[1]))
+
+m_3 <- glm(y ~ poly(x,3), data=DF)
+cv.err <- cv.glm(DF, m_3)
+print(paste("Model (3): The LOOCV output is ", cv.err$delta[1]))
+
+m_4 <- glm(y ~ poly(x,4), data=DF)
+cv.err <- cv.glm(DF, m_4)
+print(paste("Model (4): The LOOCV output is ", cv.err$delta[1]))
+
+# Do 10 fold CV on each model:
+# 
+cv.err <- cv.glm(DF, m_1, K=10)
+print(paste("Model (1): The 10 fold CV output is ", cv.err$delta[1]))
+
+cv.err <- cv.glm(DF, m_2, K=10)
+print(paste("Model (2): The 10 fold CV output is ", cv.err$delta[1]))
+
+cv.err <- cv.glm(DF, m_3, K=10)
+print(paste("Model (3): The 10 fold CV output is ", cv.err$delta[1]))
+
+cv.err <- cv.glm(DF, m_4, K=10)
+print(paste("Model (4): The 10 fold CV output is ", cv.err$delta[1]))
+```
+
+Under two different seeds, the respective LOOCV errors are the same, but the 10-fold CV errors are different.
+
+(e) Which of the models in (c) had the smallest LOOCV and 10-fold CV error? Is this what you expected? Explain your answer.
+
+\solution
+
+The quartic (degree 4) model has the smallest CV error, which is expected as the data was generated from a quartic model.
+
+(f) Comment on the statistical significance of the coefficient estimates that results from fitting each of the models in (c) using least squares. Do these results agree with the conclusions drawn based on the cross-validation results?
+
+\solution
+
+```{r}
+summary(m_4)
+```
+The p values of the quartic model coefficients are all very small. All the four degree terms are statistically significant. This strongly agrees with the CV results that it is a quartic model.
